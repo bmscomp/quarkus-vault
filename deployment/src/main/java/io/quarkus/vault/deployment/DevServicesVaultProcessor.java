@@ -30,7 +30,7 @@ import io.quarkus.vault.runtime.config.VaultBuildTimeConfig;
 
 public class DevServicesVaultProcessor {
     private static final Logger log = Logger.getLogger(DevServicesVaultProcessor.class);
-    private static final String VAULT_IMAGE = "vault:" + VaultVersions.VAULT_TEST_VERSION;
+    private static final String VAULT_IMAGE = "hashicorp/vault:" + VaultVersions.VAULT_TEST_VERSION;
     private static final String DEV_SERVICE_LABEL = "quarkus-dev-service-vault";
     private static final String DEV_SERVICE_TOKEN = "root";
     private static final int VAULT_EXPOSED_PORT = 8200;

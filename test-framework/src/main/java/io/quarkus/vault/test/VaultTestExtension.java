@@ -30,6 +30,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -240,7 +241,7 @@ public class VaultTestExtension {
                 .withExposedPorts(POSTGRESQL_PORT)
                 .withClasspathResourceMapping("postgres-init.sql", TMP_POSTGRES_INIT_SQL_FILE, READ_ONLY);
 
-        postgresContainer.setPortBindings(Arrays.asList(MAPPED_POSTGRESQL_PORT + ":" + POSTGRESQL_PORT));
+        postgresContainer.setPortBindings(List.of(MAPPED_POSTGRESQL_PORT + ":" + POSTGRESQL_PORT));
 
         rabbitMQContainer = new RabbitMQContainer()
                 .withAdminPassword(RMQ_PASSWORD)
@@ -268,7 +269,7 @@ public class VaultTestExtension {
                 .withClasspathResourceMapping("secret.json", "/tmp/secret.json", READ_ONLY)
                 .withCommand("server", "-log-level=debug", "-config=" + TMP_VAULT_CONFIG_JSON_FILE);
 
-        vaultContainer.setPortBindings(Arrays.asList(VAULT_PORT + ":" + VAULT_PORT));
+        vaultContainer.setPortBindings(List.of(VAULT_PORT + ":" + VAULT_PORT));
 
         postgresContainer.start();
         execPostgres(format("psql -U %s -d %s -f %s", DB_USERNAME, DB_NAME, TMP_POSTGRES_INIT_SQL_FILE));
@@ -276,7 +277,7 @@ public class VaultTestExtension {
         rabbitMQContainer.start();
 
         Consumer<OutputFrame> consumer = outputFrame -> System.out.print("VAULT >> " + outputFrame.getUtf8String());
-        vaultContainer.setLogConsumers(Arrays.asList(consumer));
+        vaultContainer.setLogConsumers(List.of(consumer));
         vaultContainer.start();
 
         initVault();
@@ -284,7 +285,7 @@ public class VaultTestExtension {
     }
 
     private String getVaultImage() {
-        return "vault:" + VaultVersions.VAULT_TEST_VERSION;
+        return "hashicorp/vault:" + VaultVersions.VAULT_TEST_VERSION;
     }
 
     private void initVault() throws InterruptedException, IOException {
@@ -466,7 +467,7 @@ public class VaultTestExtension {
     }
 
     private String fetchWrappingToken(String out) {
-        Pattern wrappingTokenPattern = Pattern.compile("^wrapping_token:\\s+([^\\s]+)$", MULTILINE);
+        Pattern wrappingTokenPattern = Pattern.compile("^wrapping_token:\\s+(\\S+)$", MULTILINE);
         Matcher matcher = wrappingTokenPattern.matcher(out);
         if (matcher.find()) {
             return matcher.group(1);
@@ -559,7 +560,5 @@ public class VaultTestExtension {
         if (rabbitMQContainer != null && rabbitMQContainer.isRunning()) {
             rabbitMQContainer.stop();
         }
-
-        // VaultManager.getInstance().reset();
     }
 }

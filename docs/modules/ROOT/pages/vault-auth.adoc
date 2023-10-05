@@ -2,7 +2,7 @@
 
 include::./includes/attributes.adoc[]
 :base-guide: xref:index.adoc[Vault guide]
-:root-token: s.5VUS8pte13RqekCB2fmMT3u2
+:root-token: hvs.CAGyHiZRcfwKJxFid89IsWfH
 :client-token: s.s93BVzJPzBiIGuYJHBTkG8Uw
 :private-key: 123456
 :client-token: s.JqMeE1UEyUb19F6zmMW0SWx6

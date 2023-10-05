@@ -253,7 +253,7 @@ vault write database/roles/mydbrole \
 
 [NOTE]
 ====
-For this use case, user `sarah` configured above needs to be a PostgreSQL super user with the capability
+For this use case, user `sarah` configured above needs to be a PostgreSQL superuser with the capability
 to create users.
 ====
 

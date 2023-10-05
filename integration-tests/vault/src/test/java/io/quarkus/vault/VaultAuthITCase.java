@@ -35,8 +35,8 @@ public class VaultAuthITCase {
     @Test
     public void role() {
         String name = "test-auth-k8s";
-        List<String> boundServiceAccountNames = asList("vault-auth");
-        List<String> boundServiceAccountNamespaces = asList("default");
+        List<String> boundServiceAccountNames = List.of("vault-auth");
+        List<String> boundServiceAccountNamespaces = List.of("default");
         List<String> tokenPolicies = asList("dev", "prod");
         vaultKubernetesAuthService.createRole(name, new VaultKubernetesAuthRole()
                 .setBoundServiceAccountNames(boundServiceAccountNames)
