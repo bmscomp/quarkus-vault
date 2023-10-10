@@ -73,7 +73,8 @@ import io.quarkus.vault.test.VaultTestLifecycleManager;
 public class VaultPKIITCase {
 
     @RegisterExtension
-    static final QuarkusUnitTest config = new QuarkusUnitTest().withApplicationRoot((jar) -> jar.addAsResource("application-vault-pki.properties", "application.properties"));
+    static final QuarkusUnitTest config = new QuarkusUnitTest()
+            .withApplicationRoot((jar) -> jar.addAsResource("application-vault-pki.properties", "application.properties"));
 
     @Inject
     VaultPKISecretEngine pkiSecretEngine;
@@ -139,24 +140,31 @@ public class VaultPKIITCase {
         assertFalse(result.certificate.getData().toString().isEmpty());
         assertDoesNotThrow(() -> result.certificate.getCertificate());
 
-        X509CertificateHolder certificate = (X509CertificateHolder) new PEMParser(new StringReader((String) result.certificate.getData())).readObject();
+        X509CertificateHolder certificate = (X509CertificateHolder) new PEMParser(
+                new StringReader((String) result.certificate.getData())).readObject();
 
         assertEquals(DataFormat.PEM, result.issuingCA.getFormat());
         assertNotNull(result.issuingCA.getData());
         assertFalse(result.issuingCA.getData().toString().isEmpty());
         assertDoesNotThrow(() -> result.issuingCA.getCertificate());
 
-        X509CertificateHolder issuingCA = (X509CertificateHolder) new PEMParser(new StringReader((String) result.issuingCA.getData())).readObject();
+        X509CertificateHolder issuingCA = (X509CertificateHolder) new PEMParser(
+                new StringReader((String) result.issuingCA.getData())).readObject();
 
         // Check all subject name component options
-        assertEquals("C=USA,ST=NY,L=New York,STREET=123 Main Street,PostalCode=10030," + "O=Test Org,OU=Test Unit,CN=test.example.com,SERIALNUMBER=9876543210", certificate.getSubject().toString());
+        assertEquals(
+                "C=USA,ST=NY,L=New York,STREET=123 Main Street,PostalCode=10030,"
+                        + "O=Test Org,OU=Test Unit,CN=test.example.com,SERIALNUMBER=9876543210",
+                certificate.getSubject().toString());
 
         // Check subjectAlternativeNames, ipSubjectAlternativeNames, uriSubjectAlternativeNames,
         // otherSubjectAlternativeNames & excludeCommonNameFromSubjectAlternativeNames options
         assertNotNull(certificate.getExtension(subjectAlternativeName));
         GeneralNames generalNames = GeneralNames.getInstance(certificate.getExtension(subjectAlternativeName).getParsedValue());
-        List<String> subjectAlternativeNames = Arrays.stream(generalNames.getNames()).map(GeneralName::getName).map(ASN1Encodable::toString).collect(toList());
-        assertEquals(asList("[1.3.6.1.4.1.311.20.2.3, [0]test]", "alt.example.com", "#01020304", "ex:12345"), subjectAlternativeNames);
+        List<String> subjectAlternativeNames = Arrays.stream(generalNames.getNames()).map(GeneralName::getName)
+                .map(ASN1Encodable::toString).collect(toList());
+        assertEquals(asList("[1.3.6.1.4.1.311.20.2.3, [0]test]", "alt.example.com", "#01020304", "ex:12345"),
+                subjectAlternativeNames);
 
         // Check timeToLive option
         assertEquals(8759, Duration.between(Instant.now().plusSeconds(30), certificate.getNotAfter().toInstant()).toHours());
@@ -175,7 +183,8 @@ public class VaultPKIITCase {
         // Check permittedDnsDomains option
         assertNotNull(certificate.getExtension(nameConstraints));
         NameConstraints nameCons = NameConstraints.getInstance(certificate.getExtension(nameConstraints).getParsedValue());
-        List<String> permittedDnsDomains = Arrays.stream(nameCons.getPermittedSubtrees()).map(GeneralSubtree::getBase).map(GeneralName::getName).map(ASN1Encodable::toString).collect(toList());
+        List<String> permittedDnsDomains = Arrays.stream(nameCons.getPermittedSubtrees()).map(GeneralSubtree::getBase)
+                .map(GeneralName::getName).map(ASN1Encodable::toString).collect(toList());
         assertEquals(asList("subs1.example.com", "subs2.example.com"), permittedDnsDomains);
 
         // Check returned cert is self-signed
@@ -232,9 +241,11 @@ public class VaultPKIITCase {
         assertNotNull(result.csr.getData());
         assertFalse(result.csr.getData().toString().isEmpty());
 
-        PKCS10CertificationRequest csr = (PKCS10CertificationRequest) new PEMParser(new StringReader((String) result.csr.getData())).readObject();
+        PKCS10CertificationRequest csr = (PKCS10CertificationRequest) new PEMParser(
+                new StringReader((String) result.csr.getData())).readObject();
         // Check all subject name component options
-        assertEquals("C=USA,ST=NY,L=New York,STREET=123 Main Street,PostalCode=10030," + "O=Test Org,OU=Test Unit,CN=test.example.com,SERIALNUMBER=9876543210", csr.getSubject().toString());
+        assertEquals("C=USA,ST=NY,L=New York,STREET=123 Main Street,PostalCode=10030,"
+                + "O=Test Org,OU=Test Unit,CN=test.example.com,SERIALNUMBER=9876543210", csr.getSubject().toString());
 
         // Check subjectAlternativeNames, ipSubjectAlternativeNames, uriSubjectAlternativeNames,
         // otherSubjectAlternativeNames & excludeCommonNameFromSubjectAlternativeNames options
@@ -243,8 +254,10 @@ public class VaultPKIITCase {
 
         assertNotNull(extReq.getExtension(subjectAlternativeName));
         GeneralNames generalNames = GeneralNames.getInstance(extReq.getExtension(subjectAlternativeName).getParsedValue());
-        List<String> subjectAlternativeNames = Arrays.stream(generalNames.getNames()).map(GeneralName::getName).map(ASN1Encodable::toString).collect(toList());
-        assertEquals(asList("[1.3.6.1.4.1.311.20.2.3, [0]test]", "alt.example.com", "#01020304", "ex:12345"), subjectAlternativeNames);
+        List<String> subjectAlternativeNames = Arrays.stream(generalNames.getNames()).map(GeneralName::getName)
+                .map(ASN1Encodable::toString).collect(toList());
+        assertEquals(asList("[1.3.6.1.4.1.311.20.2.3, [0]test]", "alt.example.com", "#01020304", "ex:12345"),
+                subjectAlternativeNames);
 
         // Check keyType option
         SubjectPublicKeyInfo subPKI = csr.getSubjectPublicKeyInfo();
@@ -308,17 +321,23 @@ public class VaultPKIITCase {
         assertFalse(result.certificate.getData().toString().isEmpty());
         assertDoesNotThrow(() -> result.certificate.getCertificate());
 
-        X509CertificateHolder certificate = (X509CertificateHolder) new PEMParser(new StringReader((String) result.certificate.getData())).readObject();
-        X509CertificateHolder issuingCA = (X509CertificateHolder) new PEMParser(new StringReader((String) result.issuingCA.getData())).readObject();
+        X509CertificateHolder certificate = (X509CertificateHolder) new PEMParser(
+                new StringReader((String) result.certificate.getData())).readObject();
+        X509CertificateHolder issuingCA = (X509CertificateHolder) new PEMParser(
+                new StringReader((String) result.issuingCA.getData())).readObject();
 
         // Check all subject name component options
-        assertEquals("C=USA,ST=NY,L=New York,STREET=123 Main Street,PostalCode=10030," + "O=Test Org,OU=Test Unit,CN=test.example.com,SERIALNUMBER=9876543210", certificate.getSubject().toString());
+        assertEquals(
+                "C=USA,ST=NY,L=New York,STREET=123 Main Street,PostalCode=10030,"
+                        + "O=Test Org,OU=Test Unit,CN=test.example.com,SERIALNUMBER=9876543210",
+                certificate.getSubject().toString());
 
         // Check subjectAlternativeNames, ipSubjectAlternativeNames, uriSubjectAlternativeNames,
         // otherSubjectAlternativeNames & excludeCommonNameFromSubjectAlternativeNames options
         assertNotNull(certificate.getExtension(subjectAlternativeName));
         GeneralNames generalNames = GeneralNames.getInstance(certificate.getExtension(subjectAlternativeName).getParsedValue());
-        List<String> subjectAlternativeNames = Arrays.stream(generalNames.getNames()).map(GeneralName::getName).map(ASN1Encodable::toString).collect(toList());
+        List<String> subjectAlternativeNames = Arrays.stream(generalNames.getNames()).map(GeneralName::getName)
+                .map(ASN1Encodable::toString).collect(toList());
         assertEquals(asList("alt.example.com", "#01020304", "ex:12345"), subjectAlternativeNames);
 
         // Check timeToLive option
@@ -338,7 +357,8 @@ public class VaultPKIITCase {
         // Check permittedDnsDomains option
         assertNotNull(certificate.getExtension(nameConstraints));
         NameConstraints nameCons = NameConstraints.getInstance(certificate.getExtension(nameConstraints).getParsedValue());
-        List<String> permittedDnsDomains = Arrays.stream(nameCons.getPermittedSubtrees()).map(GeneralSubtree::getBase).map(GeneralName::getName).map(ASN1Encodable::toString).collect(toList());
+        List<String> permittedDnsDomains = Arrays.stream(nameCons.getPermittedSubtrees()).map(GeneralSubtree::getBase)
+                .map(GeneralName::getName).map(ASN1Encodable::toString).collect(toList());
         assertEquals(asList("subs1.example.com", "subs2.example.com"), permittedDnsDomains);
 
         // Check returned cert is self-signed
@@ -379,7 +399,8 @@ public class VaultPKIITCase {
         pkiSecretEngine2.setSignedIntermediateCA((String) result.certificate.getData());
 
         // Get CA cert and check subject (PEM)
-        X509CertificateHolder certificate = (X509CertificateHolder) new PEMParser(new StringReader(pkiSecretEngine2.getCertificateAuthority().getData())).readObject();
+        X509CertificateHolder certificate = (X509CertificateHolder) new PEMParser(
+                new StringReader(pkiSecretEngine2.getCertificateAuthority().getData())).readObject();
 
         assertEquals("CN=test1.example.com", certificate.getSubject().toString());
     }
@@ -533,14 +554,16 @@ public class VaultPKIITCase {
         assertFalse(result.certificate.getData().toString().isEmpty());
         assertDoesNotThrow(() -> result.certificate.getCertificate());
 
-        X509CertificateHolder certificate = (X509CertificateHolder) new PEMParser(new StringReader((String) result.certificate.getData())).readObject();
+        X509CertificateHolder certificate = (X509CertificateHolder) new PEMParser(
+                new StringReader((String) result.certificate.getData())).readObject();
 
         assertEquals(DataFormat.PEM, result.issuingCA.getFormat());
         assertNotNull(result.issuingCA.getData());
         assertFalse(result.issuingCA.getData().toString().isEmpty());
         assertDoesNotThrow(() -> result.issuingCA.getCertificate());
 
-        X509CertificateHolder issuingCA = (X509CertificateHolder) new PEMParser(new StringReader((String) result.issuingCA.getData())).readObject();
+        X509CertificateHolder issuingCA = (X509CertificateHolder) new PEMParser(
+                new StringReader((String) result.issuingCA.getData())).readObject();
 
         // Check all subject name component options
         assertEquals("CN=test.example.com", certificate.getSubject().toString());
@@ -549,8 +572,10 @@ public class VaultPKIITCase {
         // otherSubjectAlternativeNames & excludeCommonNameFromSubjectAlternativeNames options
         assertNotNull(certificate.getExtension(subjectAlternativeName));
         GeneralNames generalNames = GeneralNames.getInstance(certificate.getExtension(subjectAlternativeName).getParsedValue());
-        List<String> subjectAlternativeNames = Arrays.stream(generalNames.getNames()).map(GeneralName::getName).map(ASN1Encodable::toString).collect(toList());
-        assertEquals(asList("[1.3.6.1.4.1.311.20.2.3, [0]test]", "alt.example.com", "#01020304", "ex:12345"), subjectAlternativeNames);
+        List<String> subjectAlternativeNames = Arrays.stream(generalNames.getNames()).map(GeneralName::getName)
+                .map(ASN1Encodable::toString).collect(toList());
+        assertEquals(asList("[1.3.6.1.4.1.311.20.2.3, [0]test]", "alt.example.com", "#01020304", "ex:12345"),
+                subjectAlternativeNames);
 
         // Check timeToLive option
         assertEquals(332, Duration.between(Instant.now().plusSeconds(30), certificate.getNotAfter().toInstant()).toMinutes());
@@ -625,8 +650,10 @@ public class VaultPKIITCase {
         // otherSubjectAlternativeNames & excludeCommonNameFromSubjectAlternativeNames options
         assertNotNull(certificate.getExtension(subjectAlternativeName));
         GeneralNames generalNames = GeneralNames.getInstance(certificate.getExtension(subjectAlternativeName).getParsedValue());
-        List<String> subjectAlternativeNames = Arrays.stream(generalNames.getNames()).map(GeneralName::getName).map(ASN1Encodable::toString).collect(toList());
-        assertEquals(asList("[1.3.6.1.4.1.311.20.2.3, [0]test]", "alt.example.com", "#01020304", "ex:12345"), subjectAlternativeNames);
+        List<String> subjectAlternativeNames = Arrays.stream(generalNames.getNames()).map(GeneralName::getName)
+                .map(ASN1Encodable::toString).collect(toList());
+        assertEquals(asList("[1.3.6.1.4.1.311.20.2.3, [0]test]", "alt.example.com", "#01020304", "ex:12345"),
+                subjectAlternativeNames);
 
         // Check timeToLive option
         assertEquals(332, Duration.between(Instant.now().plusSeconds(30), certificate.getNotAfter().toInstant()).toMinutes());
@@ -672,7 +699,22 @@ public class VaultPKIITCase {
         // Test CSR signing
 
         // CSR with "csr.example.com" and CN
-        String pemCSR = "-----BEGIN CERTIFICATE REQUEST-----\n" + "MIICszCCAZsCAQAwbjELMAkGA1UEBhMCVVMxGDAWBgNVBAMMD2Nzci5leGFtcGxl\n" + "LmNvbTERMA8GA1UEBwwITmV3IFlvdXIxETAPBgNVBAoMCFRlc3QgT3JnMQswCQYD\n" + "VQQIDAJOWTESMBAGA1UECwwJVGVzdCBVbml0MIIBIjANBgkqhkiG9w0BAQEFAAOC\n" + "AQ8AMIIBCgKCAQEAn8G6AIZe/FBzLM7ALBt1Z5CcE64dkjYADVLUlSUBX5aPOycg\n" + "oPm5RB0DMdgjRjsGvPRvz0NdpH7KsFYfeOh9ltI/YAiGITaHUlEDGH4fi4ZDSpWX\n" + "jg4+DhqP3E4/krl9jpeV8PRRTNlrSh5X9wVWsL5rd1q+g5aBTav36/duyTpfwDkL\n" + "MKGcaQVFqy+ChNWrj929EuahO2Sw8WLOGDqOQIYF0QlltdPil9YiumUoWUkYjZP9\n" + "iunstT0yX+daEhxgahROAen6r7/rj8hCmNBw4CCAVsGHb8u8Ti+yn0Rov7SQxgd3\n" + "1smQBvCXKk3HYnlwHHKORFI8v0q/NsE4PswBfwIDAQABoAAwDQYJKoZIhvcNAQEL\n" + "BQADggEBABdPp6/5zTGTY/GxONbmKHByVUH4VPPXAFQMUEOitIJI8SxAmoNnGCW2\n" + "VTeefrJsyixyLpgG7w5YXnd1947SOa9IN/1BWIMBVhhetPRSNAF+jM6paFmfAiVM\n" + "kGPgpHQ1Tk4aPGVwXL51qZP8xwBUMjG+tx0RzRG1fgVUc2NWWNGlYx223xQuwsEg\n" + "C3N5T+3bboAvMKTftaKtc43VOqw75iYnY+rOsvjPgPlBRyNuzRtVDhdvL5OlI8AL\n" + "Y0EZ2xRrYf2m+BnAGInOThIHqfFsRE7sdNJemE5jJsB5y/tpH4MQi2DZIJce45bu\n" + "VVlwf9Wg4h289zEGKPbz35MPUMoQfec=\n" + "-----END CERTIFICATE REQUEST-----\n";
+        String pemCSR = "-----BEGIN CERTIFICATE REQUEST-----\n"
+                + "MIICszCCAZsCAQAwbjELMAkGA1UEBhMCVVMxGDAWBgNVBAMMD2Nzci5leGFtcGxl\n"
+                + "LmNvbTERMA8GA1UEBwwITmV3IFlvdXIxETAPBgNVBAoMCFRlc3QgT3JnMQswCQYD\n"
+                + "VQQIDAJOWTESMBAGA1UECwwJVGVzdCBVbml0MIIBIjANBgkqhkiG9w0BAQEFAAOC\n"
+                + "AQ8AMIIBCgKCAQEAn8G6AIZe/FBzLM7ALBt1Z5CcE64dkjYADVLUlSUBX5aPOycg\n"
+                + "oPm5RB0DMdgjRjsGvPRvz0NdpH7KsFYfeOh9ltI/YAiGITaHUlEDGH4fi4ZDSpWX\n"
+                + "jg4+DhqP3E4/krl9jpeV8PRRTNlrSh5X9wVWsL5rd1q+g5aBTav36/duyTpfwDkL\n"
+                + "MKGcaQVFqy+ChNWrj929EuahO2Sw8WLOGDqOQIYF0QlltdPil9YiumUoWUkYjZP9\n"
+                + "iunstT0yX+daEhxgahROAen6r7/rj8hCmNBw4CCAVsGHb8u8Ti+yn0Rov7SQxgd3\n"
+                + "1smQBvCXKk3HYnlwHHKORFI8v0q/NsE4PswBfwIDAQABoAAwDQYJKoZIhvcNAQEL\n"
+                + "BQADggEBABdPp6/5zTGTY/GxONbmKHByVUH4VPPXAFQMUEOitIJI8SxAmoNnGCW2\n"
+                + "VTeefrJsyixyLpgG7w5YXnd1947SOa9IN/1BWIMBVhhetPRSNAF+jM6paFmfAiVM\n"
+                + "kGPgpHQ1Tk4aPGVwXL51qZP8xwBUMjG+tx0RzRG1fgVUc2NWWNGlYx223xQuwsEg\n"
+                + "C3N5T+3bboAvMKTftaKtc43VOqw75iYnY+rOsvjPgPlBRyNuzRtVDhdvL5OlI8AL\n"
+                + "Y0EZ2xRrYf2m+BnAGInOThIHqfFsRE7sdNJemE5jJsB5y/tpH4MQi2DZIJce45bu\n" + "VVlwf9Wg4h289zEGKPbz35MPUMoQfec=\n"
+                + "-----END CERTIFICATE REQUEST-----\n";
 
         GenerateCertificateOptions options = new GenerateCertificateOptions();
         options.setSubjectCommonName("test.example.com");
@@ -690,8 +732,10 @@ public class VaultPKIITCase {
         assertFalse(result.certificate.getData().toString().isEmpty());
         assertDoesNotThrow(() -> result.certificate.getCertificate());
 
-        X509CertificateHolder certificate = (X509CertificateHolder) new PEMParser(new StringReader((String) result.certificate.getData())).readObject();
-        X509CertificateHolder issuingCA = (X509CertificateHolder) new PEMParser(new StringReader((String) result.issuingCA.getData())).readObject();
+        X509CertificateHolder certificate = (X509CertificateHolder) new PEMParser(
+                new StringReader((String) result.certificate.getData())).readObject();
+        X509CertificateHolder issuingCA = (X509CertificateHolder) new PEMParser(
+                new StringReader((String) result.issuingCA.getData())).readObject();
 
         // Check all subject name component options
         assertEquals("CN=test.example.com", certificate.getSubject().toString());
@@ -700,8 +744,10 @@ public class VaultPKIITCase {
         // otherSubjectAlternativeNames & excludeCommonNameFromSubjectAlternativeNames options
         assertNotNull(certificate.getExtension(subjectAlternativeName));
         GeneralNames generalNames = GeneralNames.getInstance(certificate.getExtension(subjectAlternativeName).getParsedValue());
-        List<String> subjectAlternativeNames = Arrays.stream(generalNames.getNames()).map(GeneralName::getName).map(ASN1Encodable::toString).collect(toList());
-        assertEquals(asList("[1.3.6.1.4.1.311.20.2.3, [0]test]", "alt.example.com", "#01020304", "ex:12345"), subjectAlternativeNames);
+        List<String> subjectAlternativeNames = Arrays.stream(generalNames.getNames()).map(GeneralName::getName)
+                .map(ASN1Encodable::toString).collect(toList());
+        assertEquals(asList("[1.3.6.1.4.1.311.20.2.3, [0]test]", "alt.example.com", "#01020304", "ex:12345"),
+                subjectAlternativeNames);
 
         // Check timeToLive option
         assertEquals(332, Duration.between(Instant.now().plusSeconds(30), certificate.getNotAfter().toInstant()).toMinutes());
@@ -862,7 +908,8 @@ public class VaultPKIITCase {
         SignedCertificate result = pkiSecretEngine.signIntermediateCA((String) csrResult.csr.getData(), options);
 
         // Set signed intermediate CA & root CA chain into "pki2"
-        pkiSecretEngine2.setSignedIntermediateCA(result.certificate.getData() + "\n" + generatedRootCertificate.certificate.getData());
+        pkiSecretEngine2
+                .setSignedIntermediateCA(result.certificate.getData() + "\n" + generatedRootCertificate.certificate.getData());
 
         // Get CA chain and check subjects
         CAChainData.PEM caChainData = pkiSecretEngine2.getCertificateAuthorityChain();
@@ -900,7 +947,8 @@ public class VaultPKIITCase {
 
         // Set root CA from "pki" into "pki2"
         VaultPKISecretEngine pkiSecretEngine2 = pkiSecretEngineFactory.engine("pki2");
-        pkiSecretEngine2.configCertificateAuthority(generatedRootCertificate.certificate.getData() + "\n" + generatedRootCertificate.privateKey.getData());
+        pkiSecretEngine2.configCertificateAuthority(
+                generatedRootCertificate.certificate.getData() + "\n" + generatedRootCertificate.privateKey.getData());
 
         // Get CA cert and check subject (PEM)
         CertificateData.PEM pemCAData = pkiSecretEngine2.getCertificateAuthority();
