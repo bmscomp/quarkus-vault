@@ -74,17 +74,12 @@ public class VaultPKIManager implements VaultPKISecretReactiveEngine {
     private final VaultInternalPKISecretEngine vaultInternalPKISecretEngine;
 
     @Inject
-    public VaultPKIManager(
-            VaultClient vaultClient,
-            VaultAuthManager vaultAuthManager,
+    public VaultPKIManager(VaultClient vaultClient, VaultAuthManager vaultAuthManager,
             VaultInternalPKISecretEngine vaultInternalPKISecretEngine) {
         this(vaultClient, PKI_ENGINE_NAME, vaultAuthManager, vaultInternalPKISecretEngine);
     }
 
-    VaultPKIManager(
-            VaultClient vaultClient,
-            String mount,
-            VaultAuthManager vaultAuthManager,
+    VaultPKIManager(VaultClient vaultClient, String mount, VaultAuthManager vaultAuthManager,
             VaultInternalPKISecretEngine vaultInternalPKISecretEngine) {
         this.vaultClient = vaultClient;
         this.mount = mount;
@@ -101,17 +96,16 @@ public class VaultPKIManager implements VaultPKISecretReactiveEngine {
     public Uni<CertificateData> getCertificateAuthority(DataFormat format) {
         return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
             String vaultFormat = format == DataFormat.PEM ? format.name().toLowerCase(Locale.ROOT) : null;
-            return vaultInternalPKISecretEngine.getCertificateAuthority(vaultClient, token, mount, vaultFormat)
-                    .map(data -> {
-                        switch (format) {
-                            case PEM:
-                                return new PEM(data.toString(StandardCharsets.UTF_8));
-                            case DER:
-                                return new DER(data.getBytes());
-                            default:
-                                throw new VaultException("Unsupported Data Format");
-                        }
-                    });
+            return vaultInternalPKISecretEngine.getCertificateAuthority(vaultClient, token, mount, vaultFormat).map(data -> {
+                switch (format) {
+                    case PEM:
+                        return new PEM(data.toString(StandardCharsets.UTF_8));
+                    case DER:
+                        return new DER(data.getBytes());
+                    default:
+                        throw new VaultException("Unsupported Data Format");
+                }
+            });
         });
     }
 
@@ -139,18 +133,17 @@ public class VaultPKIManager implements VaultPKISecretReactiveEngine {
     @Override
     public Uni<ConfigURLsOptions> readURLsConfig() {
         return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalPKISecretEngine.readURLs(vaultClient, token, mount)
-                    .map(internalResult -> {
-                        checkDataValid(internalResult);
+            return vaultInternalPKISecretEngine.readURLs(vaultClient, token, mount).map(internalResult -> {
+                checkDataValid(internalResult);
 
-                        VaultPKIConfigURLsData internalResultData = internalResult.data;
+                VaultPKIConfigURLsData internalResultData = internalResult.data;
 
-                        ConfigURLsOptions result = new ConfigURLsOptions();
-                        result.issuingCertificates = internalResultData.issuingCertificates;
-                        result.crlDistributionPoints = internalResultData.crlDistributionPoints;
-                        result.ocspServers = internalResultData.ocspServers;
-                        return result;
-                    });
+                ConfigURLsOptions result = new ConfigURLsOptions();
+                result.issuingCertificates = internalResultData.issuingCertificates;
+                result.crlDistributionPoints = internalResultData.crlDistributionPoints;
+                result.ocspServers = internalResultData.ocspServers;
+                return result;
+            });
         });
     }
 
@@ -168,17 +161,16 @@ public class VaultPKIManager implements VaultPKISecretReactiveEngine {
     @Override
     public Uni<ConfigCRLOptions> readCRLConfig() {
         return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalPKISecretEngine.readCRL(vaultClient, token, mount)
-                    .map(internalResult -> {
-                        checkDataValid(internalResult);
+            return vaultInternalPKISecretEngine.readCRL(vaultClient, token, mount).map(internalResult -> {
+                checkDataValid(internalResult);
 
-                        VaultPKIConfigCRLData internalResultData = internalResult.data;
+                VaultPKIConfigCRLData internalResultData = internalResult.data;
 
-                        ConfigCRLOptions result = new ConfigCRLOptions();
-                        result.expiry = internalResultData.expiry;
-                        result.disable = internalResultData.disable;
-                        return result;
-                    });
+                ConfigCRLOptions result = new ConfigCRLOptions();
+                result.expiry = internalResultData.expiry;
+                result.disable = internalResultData.disable;
+                return result;
+            });
         });
     }
 
@@ -228,42 +220,38 @@ public class VaultPKIManager implements VaultPKISecretReactiveEngine {
     @Override
     public Uni<List<String>> getCertificates() {
         return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalPKISecretEngine.listCertificates(vaultClient, token, mount)
-                    .map(internalResult -> {
-                        checkDataValid(internalResult);
+            return vaultInternalPKISecretEngine.listCertificates(vaultClient, token, mount).map(internalResult -> {
+                checkDataValid(internalResult);
 
-                        // Return serials corrected to colon format (to match those returned by generateCertificate/signRequest)
-                        return internalResult.data.keys.stream()
-                                .map(serial -> serial.replaceAll("-", ":"))
-                                .collect(toList());
-                    });
+                // Return serials corrected to colon format (to match those returned by generateCertificate/signRequest)
+                return internalResult.data.keys.stream().map(serial -> serial.replaceAll("-", ":")).collect(toList());
+            });
         });
     }
 
     @Override
     public Uni<CertificateData.PEM> getCertificate(String serial) {
         return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalPKISecretEngine.getCertificate(vaultClient, token, mount, serial)
-                    .map(internalResult -> {
-                        checkDataValid(internalResult);
+            return vaultInternalPKISecretEngine.getCertificate(vaultClient, token, mount, serial).map(internalResult -> {
+                checkDataValid(internalResult);
 
-                        return new CertificateData.PEM(internalResult.data.certificate);
-                    });
+                return new CertificateData.PEM(internalResult.data.certificate);
+            });
         });
     }
 
     @Override
     public Uni<GeneratedCertificate> generateCertificate(String role, GenerateCertificateOptions options) {
         VaultPKIGenerateCertificateBody body = new VaultPKIGenerateCertificateBody();
-        body.format = dataFormatToFormat(options.format);
-        body.privateKeyFormat = privateKeyFormat(options.format, options.privateKeyEncoding);
-        body.subjectCommonName = options.subjectCommonName;
-        body.subjectAlternativeNames = stringListToCommaString(options.subjectAlternativeNames);
-        body.ipSubjectAlternativeNames = stringListToCommaString(options.ipSubjectAlternativeNames);
-        body.uriSubjectAlternativeNames = stringListToCommaString(options.uriSubjectAlternativeNames);
-        body.otherSubjectAlternativeNames = options.otherSubjectAlternativeNames;
-        body.timeToLive = options.timeToLive;
-        body.excludeCommonNameFromSubjectAlternativeNames = options.excludeCommonNameFromSubjectAlternativeNames;
+        body.format = dataFormatToFormat(options.getFormat());
+        body.privateKeyFormat = privateKeyFormat(options.getFormat(), options.getPrivateKeyEncoding());
+        body.subjectCommonName = options.getSubjectCommonName();
+        body.subjectAlternativeNames = stringListToCommaString(options.getSubjectAlternativeNames());
+        body.ipSubjectAlternativeNames = stringListToCommaString(options.getIpSubjectAlternativeNames());
+        body.uriSubjectAlternativeNames = stringListToCommaString(options.getUriSubjectAlternativeNames());
+        body.otherSubjectAlternativeNames = options.getOtherSubjectAlternativeNames();
+        body.timeToLive = options.getTimeToLive();
+        body.excludeCommonNameFromSubjectAlternativeNames = options.getExcludeCommonNameFromSubjectAlternativeNames();
 
         return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
             return vaultInternalPKISecretEngine.generateCertificate(vaultClient, token, mount, role, body)
@@ -288,30 +276,29 @@ public class VaultPKIManager implements VaultPKISecretReactiveEngine {
     @Override
     public Uni<SignedCertificate> signRequest(String role, String pemSigningRequest, GenerateCertificateOptions options) {
         VaultPKISignCertificateRequestBody body = new VaultPKISignCertificateRequestBody();
-        body.format = dataFormatToFormat(options.format);
+        body.format = dataFormatToFormat(options.getFormat());
         body.csr = pemSigningRequest;
-        body.subjectCommonName = options.subjectCommonName;
-        body.subjectAlternativeNames = stringListToCommaString(options.subjectAlternativeNames);
-        body.ipSubjectAlternativeNames = stringListToCommaString(options.ipSubjectAlternativeNames);
-        body.uriSubjectAlternativeNames = stringListToCommaString(options.uriSubjectAlternativeNames);
-        body.otherSubjectAlternativeNames = options.otherSubjectAlternativeNames;
-        body.timeToLive = options.timeToLive;
-        body.excludeCommonNameFromSubjectAlternativeNames = options.excludeCommonNameFromSubjectAlternativeNames;
+        body.subjectCommonName = options.getSubjectCommonName();
+        body.subjectAlternativeNames = stringListToCommaString(options.getSubjectAlternativeNames());
+        body.ipSubjectAlternativeNames = stringListToCommaString(options.getIpSubjectAlternativeNames());
+        body.uriSubjectAlternativeNames = stringListToCommaString(options.getUriSubjectAlternativeNames());
+        body.otherSubjectAlternativeNames = options.getOtherSubjectAlternativeNames();
+        body.timeToLive = options.getTimeToLive();
+        body.excludeCommonNameFromSubjectAlternativeNames = options.getExcludeCommonNameFromSubjectAlternativeNames();
 
         return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalPKISecretEngine.signCertificate(vaultClient, token, mount, role, body)
-                    .map(internalResult -> {
-                        checkDataValid(internalResult);
+            return vaultInternalPKISecretEngine.signCertificate(vaultClient, token, mount, role, body).map(internalResult -> {
+                checkDataValid(internalResult);
 
-                        VaultPKISignCertificateRequestData internalResultData = internalResult.data;
+                VaultPKISignCertificateRequestData internalResultData = internalResult.data;
 
-                        SignedCertificate result = new SignedCertificate();
-                        result.certificate = createCertificateData(internalResultData.certificate, body.format);
-                        result.issuingCA = createCertificateData(internalResultData.issuingCA, body.format);
-                        result.caChain = createCertificateDataList(internalResultData.caChain, body.format);
-                        result.serialNumber = internalResultData.serialNumber;
-                        return result;
-                    });
+                SignedCertificate result = new SignedCertificate();
+                result.certificate = createCertificateData(internalResultData.certificate, body.format);
+                result.issuingCA = createCertificateData(internalResultData.issuingCA, body.format);
+                result.caChain = createCertificateDataList(internalResultData.caChain, body.format);
+                result.serialNumber = internalResultData.serialNumber;
+                return result;
+            });
         });
     }
 
@@ -321,12 +308,11 @@ public class VaultPKIManager implements VaultPKISecretReactiveEngine {
         body.serialNumber = serialNumber;
 
         return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalPKISecretEngine.revokeCertificate(vaultClient, token, mount, body)
-                    .map(internalResult -> {
-                        checkDataValid(internalResult);
+            return vaultInternalPKISecretEngine.revokeCertificate(vaultClient, token, mount, body).map(internalResult -> {
+                checkDataValid(internalResult);
 
-                        return internalResult.data.revocationTime;
-                    });
+                return internalResult.data.revocationTime;
+            });
         });
     }
 
@@ -380,76 +366,72 @@ public class VaultPKIManager implements VaultPKISecretReactiveEngine {
     @Override
     public Uni<RoleOptions> getRole(String role) {
         return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalPKISecretEngine.readRole(vaultClient, token, mount, role)
-                    .map(internalResult -> {
-                        checkDataValid(internalResult);
+            return vaultInternalPKISecretEngine.readRole(vaultClient, token, mount, role).map(internalResult -> {
+                checkDataValid(internalResult);
 
-                        VaultPKIRoleOptionsData internalResultData = internalResult.data;
+                VaultPKIRoleOptionsData internalResultData = internalResult.data;
 
-                        RoleOptions result = new RoleOptions();
-                        result.timeToLive = internalResultData.timeToLive;
-                        result.maxTimeToLive = internalResultData.maxTimeToLive;
-                        result.allowLocalhost = internalResultData.allowLocalhost;
-                        result.allowedDomains = internalResultData.allowedDomains;
-                        result.allowTemplatesInAllowedDomains = internalResultData.allowTemplatesInAllowedDomains;
-                        result.allowBareDomains = internalResultData.allowBareDomains;
-                        result.allowSubdomains = internalResultData.allowSubdomains;
-                        result.allowGlobsInAllowedDomains = internalResultData.allowGlobsInAllowedDomains;
-                        result.allowAnyName = internalResultData.allowAnyName;
-                        result.enforceHostnames = internalResultData.enforceHostnames;
-                        result.allowIpSubjectAlternativeNames = internalResultData.allowIpSubjectAlternativeNames;
-                        result.allowedUriSubjectAlternativeNames = internalResultData.allowedUriSubjectAlternativeNames;
-                        result.allowedOtherSubjectAlternativeNames = internalResultData.allowedOtherSubjectAlternativeNames;
-                        result.serverFlag = internalResultData.serverFlag;
-                        result.clientFlag = internalResultData.clientFlag;
-                        result.codeSigningFlag = internalResultData.codeSigningFlag;
-                        result.emailProtectionFlag = internalResultData.emailProtectionFlag;
-                        result.keyType = stringToCertificateKeyType(internalResultData.keyType);
-                        result.keyBits = internalResultData.keyBits;
-                        result.keyUsages = stringListToEnumList(internalResultData.keyUsages, CertificateKeyUsage::valueOf);
-                        result.extendedKeyUsages = stringListToEnumList(internalResultData.extendedKeyUsages,
-                                CertificateExtendedKeyUsage::valueOf);
-                        result.extendedKeyUsageOIDs = internalResultData.extendedKeyUsageOIDs;
-                        result.useCSRCommonName = internalResultData.useCSRCommonName;
-                        result.useCSRSubjectAlternativeNames = internalResultData.useCSRSubjectAlternativeNames;
-                        result.subjectOrganization = stringListToCommaString(internalResultData.subjectOrganization);
-                        result.subjectOrganizationalUnit = stringListToCommaString(
-                                internalResultData.subjectOrganizationalUnit);
-                        result.subjectStreetAddress = stringListToCommaString(internalResultData.subjectStreetAddress);
-                        result.subjectPostalCode = stringListToCommaString(internalResultData.subjectPostalCode);
-                        result.subjectLocality = stringListToCommaString(internalResultData.subjectLocality);
-                        result.subjectProvince = stringListToCommaString(internalResultData.subjectProvince);
-                        result.subjectCountry = stringListToCommaString(internalResultData.subjectCountry);
-                        result.allowedSubjectSerialNumbers = internalResultData.allowedSubjectSerialNumbers;
-                        result.generateLease = internalResultData.generateLease;
-                        result.noStore = internalResultData.noStore;
-                        result.requireCommonName = internalResultData.requireCommonName;
-                        result.policyOIDs = internalResultData.policyOIDs;
-                        result.basicConstraintsValidForNonCA = internalResultData.basicConstraintsValidForNonCA;
-                        result.notBeforeDuration = internalResultData.notBeforeDuration;
-                        return result;
-                    });
+                RoleOptions result = new RoleOptions();
+                result.timeToLive = internalResultData.timeToLive;
+                result.maxTimeToLive = internalResultData.maxTimeToLive;
+                result.allowLocalhost = internalResultData.allowLocalhost;
+                result.allowedDomains = internalResultData.allowedDomains;
+                result.allowTemplatesInAllowedDomains = internalResultData.allowTemplatesInAllowedDomains;
+                result.allowBareDomains = internalResultData.allowBareDomains;
+                result.allowSubdomains = internalResultData.allowSubdomains;
+                result.allowGlobsInAllowedDomains = internalResultData.allowGlobsInAllowedDomains;
+                result.allowAnyName = internalResultData.allowAnyName;
+                result.enforceHostnames = internalResultData.enforceHostnames;
+                result.allowIpSubjectAlternativeNames = internalResultData.allowIpSubjectAlternativeNames;
+                result.allowedUriSubjectAlternativeNames = internalResultData.allowedUriSubjectAlternativeNames;
+                result.allowedOtherSubjectAlternativeNames = internalResultData.allowedOtherSubjectAlternativeNames;
+                result.serverFlag = internalResultData.serverFlag;
+                result.clientFlag = internalResultData.clientFlag;
+                result.codeSigningFlag = internalResultData.codeSigningFlag;
+                result.emailProtectionFlag = internalResultData.emailProtectionFlag;
+                result.keyType = stringToCertificateKeyType(internalResultData.keyType);
+                result.keyBits = internalResultData.keyBits;
+                result.keyUsages = stringListToEnumList(internalResultData.keyUsages, CertificateKeyUsage::valueOf);
+                result.extendedKeyUsages = stringListToEnumList(internalResultData.extendedKeyUsages,
+                        CertificateExtendedKeyUsage::valueOf);
+                result.extendedKeyUsageOIDs = internalResultData.extendedKeyUsageOIDs;
+                result.useCSRCommonName = internalResultData.useCSRCommonName;
+                result.useCSRSubjectAlternativeNames = internalResultData.useCSRSubjectAlternativeNames;
+                result.subjectOrganization = stringListToCommaString(internalResultData.subjectOrganization);
+                result.subjectOrganizationalUnit = stringListToCommaString(internalResultData.subjectOrganizationalUnit);
+                result.subjectStreetAddress = stringListToCommaString(internalResultData.subjectStreetAddress);
+                result.subjectPostalCode = stringListToCommaString(internalResultData.subjectPostalCode);
+                result.subjectLocality = stringListToCommaString(internalResultData.subjectLocality);
+                result.subjectProvince = stringListToCommaString(internalResultData.subjectProvince);
+                result.subjectCountry = stringListToCommaString(internalResultData.subjectCountry);
+                result.allowedSubjectSerialNumbers = internalResultData.allowedSubjectSerialNumbers;
+                result.generateLease = internalResultData.generateLease;
+                result.noStore = internalResultData.noStore;
+                result.requireCommonName = internalResultData.requireCommonName;
+                result.policyOIDs = internalResultData.policyOIDs;
+                result.basicConstraintsValidForNonCA = internalResultData.basicConstraintsValidForNonCA;
+                result.notBeforeDuration = internalResultData.notBeforeDuration;
+                return result;
+            });
         });
     }
 
     @Override
     public Uni<List<String>> getRoles() {
         return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalPKISecretEngine.listRoles(vaultClient, token, mount)
-                    .map(internalResult -> {
-                        checkDataValid(internalResult);
+            return vaultInternalPKISecretEngine.listRoles(vaultClient, token, mount).map(internalResult -> {
+                checkDataValid(internalResult);
 
-                        return internalResult.data.keys;
-                    })
-                    .onFailure(VaultClientException.class).recoverWithUni(x -> {
-                        VaultClientException vx = (VaultClientException) x;
-                        // Translate 404 to empty list
-                        if (vx.getStatus() == 404) {
-                            return Uni.createFrom().item(emptyList());
-                        } else {
-                            return Uni.createFrom().failure(x);
-                        }
-                    });
+                return internalResult.data.keys;
+            }).onFailure(VaultClientException.class).recoverWithUni(x -> {
+                VaultClientException vx = (VaultClientException) x;
+                // Translate 404 to empty list
+                if (vx.getStatus() == 404) {
+                    return Uni.createFrom().item(emptyList());
+                } else {
+                    return Uni.createFrom().failure(x);
+                }
+            });
         });
     }
 
@@ -487,21 +469,19 @@ public class VaultPKIManager implements VaultPKISecretReactiveEngine {
         body.subjectSerialNumber = options.subjectSerialNumber;
 
         return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalPKISecretEngine.generateRoot(vaultClient, token, mount, type, body)
-                    .map(internalResult -> {
-                        checkDataValid(internalResult);
+            return vaultInternalPKISecretEngine.generateRoot(vaultClient, token, mount, type, body).map(internalResult -> {
+                checkDataValid(internalResult);
 
-                        VaultPKIGenerateRootData internalResultData = internalResult.data;
+                VaultPKIGenerateRootData internalResultData = internalResult.data;
 
-                        GeneratedRootCertificate result = new GeneratedRootCertificate();
-                        result.certificate = createCertificateData(internalResultData.certificate, body.format);
-                        result.issuingCA = createCertificateData(internalResultData.issuingCA, body.format);
-                        result.serialNumber = internalResultData.serialNumber;
-                        result.privateKeyType = stringToCertificateKeyType(internalResultData.privateKeyType);
-                        result.privateKey = createPrivateKeyData(internalResultData.privateKey, body.format,
-                                body.privateKeyFormat);
-                        return result;
-                    });
+                GeneratedRootCertificate result = new GeneratedRootCertificate();
+                result.certificate = createCertificateData(internalResultData.certificate, body.format);
+                result.issuingCA = createCertificateData(internalResultData.issuingCA, body.format);
+                result.serialNumber = internalResultData.serialNumber;
+                result.privateKeyType = stringToCertificateKeyType(internalResultData.privateKeyType);
+                result.privateKey = createPrivateKeyData(internalResultData.privateKey, body.format, body.privateKeyFormat);
+                return result;
+            });
         });
     }
 
@@ -537,19 +517,18 @@ public class VaultPKIManager implements VaultPKISecretReactiveEngine {
         body.subjectSerialNumber = options.subjectSerialNumber;
 
         return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalPKISecretEngine.signIntermediateCA(vaultClient, token, mount, body)
-                    .map(internalResult -> {
-                        checkDataValid(internalResult);
+            return vaultInternalPKISecretEngine.signIntermediateCA(vaultClient, token, mount, body).map(internalResult -> {
+                checkDataValid(internalResult);
 
-                        VaultPKISignCertificateRequestData internalResultData = internalResult.data;
+                VaultPKISignCertificateRequestData internalResultData = internalResult.data;
 
-                        SignedCertificate result = new SignedCertificate();
-                        result.certificate = createCertificateData(internalResultData.certificate, body.format);
-                        result.issuingCA = createCertificateData(internalResultData.issuingCA, body.format);
-                        result.caChain = createCertificateDataList(internalResultData.caChain, body.format);
-                        result.serialNumber = internalResultData.serialNumber;
-                        return result;
-                    });
+                SignedCertificate result = new SignedCertificate();
+                result.certificate = createCertificateData(internalResultData.certificate, body.format);
+                result.issuingCA = createCertificateData(internalResultData.issuingCA, body.format);
+                result.caChain = createCertificateDataList(internalResultData.caChain, body.format);
+                result.serialNumber = internalResultData.serialNumber;
+                return result;
+            });
         });
     }
 
