@@ -205,11 +205,11 @@ public interface VaultPKISecretReactiveEngine {
 
     /**
      * Generates a Certificate Signing Request and private key for the engine's CA.
-     *
+     * <p>
      * Use this to generate a CSR and for the engine's CA that can be used by another
      * CA to issue an intermediate CA certificate. After generating the intermediate CA
      * {@link #setSignedIntermediateCA(String)} must be used to set the engine's CA certificate.
-     *
+     * <p>
      * This will overwrite any previously existing CA private key for the engine.
      *
      * @see #setSignedIntermediateCA(String)
@@ -220,7 +220,7 @@ public interface VaultPKISecretReactiveEngine {
 
     /**
      * Sets the engine's intermediate CA certificate, signed by another CA.
-     *
+     * <p>
      * After generating a CSR (via {@link #generateIntermediateCSR(GenerateIntermediateCSROptions)}),
      * this method must be used to set the engine's CA.
      *

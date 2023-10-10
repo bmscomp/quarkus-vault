@@ -9,7 +9,7 @@ public class VaultHealth {
     public static final int DEFAULT_NOT_INIT_STATUS_CODE = 501;
     public static final int DEFAULT_SEALED_STATUS_CODE = 503;
 
-    private int statusCode;
+    private final int statusCode;
 
     public VaultHealth(int statusCode) {
         this.statusCode = statusCode;

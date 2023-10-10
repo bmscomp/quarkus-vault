@@ -40,33 +40,27 @@ public class VaultSecretEngineInfo {
         return type;
     }
 
-    public VaultSecretEngineInfo setDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
-        return this;
     }
 
-    public VaultSecretEngineInfo setExternalEntropyAccess(Boolean externalEntropyAccess) {
+    public void setExternalEntropyAccess(Boolean externalEntropyAccess) {
         this.externalEntropyAccess = externalEntropyAccess;
-        return this;
     }
 
-    public VaultSecretEngineInfo setLocal(Boolean local) {
+    public void setLocal(Boolean local) {
         this.local = local;
-        return this;
     }
 
-    public VaultSecretEngineInfo setSealWrap(Boolean sealWrap) {
+    public void setSealWrap(Boolean sealWrap) {
         this.sealWrap = sealWrap;
-        return this;
     }
 
-    public VaultSecretEngineInfo setType(String type) {
+    public void setType(String type) {
         this.type = type;
-        return this;
     }
 
-    public VaultSecretEngineInfo setOptions(Map<String, Object> options) {
+    public void setOptions(Map<String, Object> options) {
         this.options = options;
-        return this;
     }
 }

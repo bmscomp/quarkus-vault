@@ -11,35 +11,31 @@ public class VaultTuneInfo {
         return description;
     }
 
-    public VaultTuneInfo setDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
-        return this;
     }
 
     public Long getDefaultLeaseTimeToLive() {
         return defaultLeaseTimeToLive;
     }
 
-    public VaultTuneInfo setDefaultLeaseTimeToLive(Long defaultLeaseTimeToLive) {
+    public void setDefaultLeaseTimeToLive(Long defaultLeaseTimeToLive) {
         this.defaultLeaseTimeToLive = defaultLeaseTimeToLive;
-        return this;
     }
 
     public Long getMaxLeaseTimeToLive() {
         return maxLeaseTimeToLive;
     }
 
-    public VaultTuneInfo setMaxLeaseTimeToLive(Long maxLeaseTimeToLive) {
+    public void setMaxLeaseTimeToLive(Long maxLeaseTimeToLive) {
         this.maxLeaseTimeToLive = maxLeaseTimeToLive;
-        return this;
     }
 
     public Boolean getForceNoCache() {
         return forceNoCache;
     }
 
-    public VaultTuneInfo setForceNoCache(Boolean forceNoCache) {
+    public void setForceNoCache(Boolean forceNoCache) {
         this.forceNoCache = forceNoCache;
-        return this;
     }
 }

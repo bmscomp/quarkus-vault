@@ -4,9 +4,9 @@ import java.util.List;
 
 public class VaultInit {
 
-    private List<String> keys;
-    private List<String> keysBase64;
-    private String rootToken;
+    private final List<String> keys;
+    private final List<String> keysBase64;
+    private final String rootToken;
 
     public VaultInit(List<String> keys, List<String> keysBase64, String rootToken) {
         this.keys = keys;
@@ -28,9 +28,6 @@ public class VaultInit {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("VaultInit{");
-        sb.append(keys.size());
-        sb.append(" keys}");
-        return sb.toString();
+        return "VaultInit{" + keys.size() + " keys}";
     }
 }

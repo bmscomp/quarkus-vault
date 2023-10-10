@@ -106,61 +106,64 @@ public class VaultSystemBackendManager implements VaultSystemBackendReactiveEngi
 
     @Override
     public Uni<String> getPolicyRules(String name) {
-        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalSystemBackend.getPolicy(vaultClient, token, name).map(r -> r.data.rules);
-        });
+        return vaultAuthManager
+                .getClientToken(vaultClient)
+                .flatMap(token -> vaultInternalSystemBackend
+                        .getPolicy(vaultClient, token, name).map(r -> r.data.rules));
     }
 
     @Override
     public Uni<Void> createUpdatePolicy(String name, String policy) {
-        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalSystemBackend.createUpdatePolicy(vaultClient, token, name, new VaultPolicyBody(policy));
-        });
+        return vaultAuthManager
+                .getClientToken(vaultClient)
+                .flatMap(token -> vaultInternalSystemBackend.createUpdatePolicy(vaultClient,
+                        token,
+                        name,
+                        new VaultPolicyBody(policy)));
     }
 
     @Override
     public Uni<Void> deletePolicy(String name) {
-        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalSystemBackend.deletePolicy(vaultClient, token, name);
-        });
+        return vaultAuthManager
+                .getClientToken(vaultClient)
+                .flatMap(token -> vaultInternalSystemBackend
+                        .deletePolicy(vaultClient, token, name));
     }
 
     @Override
     public Uni<List<String>> getPolicies() {
-        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalSystemBackend.listPolicies(vaultClient, token).map(r -> r.data.policies);
-        });
+        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> vaultInternalSystemBackend
+                .listPolicies(vaultClient, token)
+                .map(r -> r.data.policies));
     }
 
     @Override
     public Uni<VaultSecretEngineInfo> getSecretEngineInfo(String mount) {
-        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalSystemBackend.getSecretEngineInfo(vaultClient, token, mount)
-                    .map(result -> {
-                        VaultSecretEngineInfo info = new VaultSecretEngineInfo();
-                        info.setDescription(result.data.description);
-                        info.setType(result.data.type);
-                        info.setLocal(result.data.local);
-                        info.setExternalEntropyAccess(result.data.externalEntropyAccess);
-                        info.setSealWrap(result.data.sealWrap);
-                        info.setOptions(result.data.options);
-                        return info;
-                    });
-        });
+        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> vaultInternalSystemBackend
+                .getSecretEngineInfo(vaultClient, token, mount)
+                .map(result -> {
+                    VaultSecretEngineInfo info = new VaultSecretEngineInfo();
+                    info.setDescription(result.data.description);
+                    info.setType(result.data.type);
+                    info.setLocal(result.data.local);
+                    info.setExternalEntropyAccess(result.data.externalEntropyAccess);
+                    info.setSealWrap(result.data.sealWrap);
+                    info.setOptions(result.data.options);
+                    return info;
+                }));
     }
 
     public Uni<VaultTuneInfo> getTuneInfo(String mount) {
-        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalSystemBackend.getTuneInfo(vaultClient, token, mount)
-                    .map(vaultTuneResult -> {
-                        VaultTuneInfo tuneInfo = new VaultTuneInfo();
-                        tuneInfo.setDefaultLeaseTimeToLive(vaultTuneResult.data.defaultLeaseTimeToLive);
-                        tuneInfo.setMaxLeaseTimeToLive(vaultTuneResult.data.maxLeaseTimeToLive);
-                        tuneInfo.setDescription(vaultTuneResult.data.description);
-                        tuneInfo.setForceNoCache(vaultTuneResult.data.forceNoCache);
-                        return tuneInfo;
-                    });
-        });
+        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> vaultInternalSystemBackend
+                .getTuneInfo(vaultClient, token, mount)
+                .map(vaultTuneResult -> {
+                    VaultTuneInfo tuneInfo = new VaultTuneInfo();
+                    tuneInfo.setDefaultLeaseTimeToLive(vaultTuneResult.data.defaultLeaseTimeToLive);
+                    tuneInfo.setMaxLeaseTimeToLive(vaultTuneResult.data.maxLeaseTimeToLive);
+                    tuneInfo.setDescription(vaultTuneResult.data.description);
+                    tuneInfo.setForceNoCache(vaultTuneResult.data.forceNoCache);
+                    return tuneInfo;
+                }));
     }
 
     @Override
@@ -171,9 +174,8 @@ public class VaultSystemBackendManager implements VaultSystemBackendReactiveEngi
         body.maxLeaseTimeToLive = tuneInfoUpdates.getMaxLeaseTimeToLive();
         body.forceNoCache = tuneInfoUpdates.getForceNoCache();
 
-        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalSystemBackend.updateTuneInfo(vaultClient, token, mount, body);
-        });
+        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> vaultInternalSystemBackend
+                .updateTuneInfo(vaultClient, token, mount, body));
     }
 
     @Override
@@ -207,15 +209,20 @@ public class VaultSystemBackendManager implements VaultSystemBackendReactiveEngi
         body.config.maxLeaseTimeToLive = options.maxLeaseTimeToLive;
         body.options = options.options;
 
-        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalSystemBackend.enableEngine(vaultClient, token, mount, body);
-        });
+        return vaultAuthManager
+                .getClientToken(vaultClient)
+                .flatMap(token -> vaultInternalSystemBackend
+                        .enableEngine(vaultClient,
+                                token,
+                                mount,
+                                body));
     }
 
     @Override
     public Uni<Void> disable(String mount) {
-        return vaultAuthManager.getClientToken(vaultClient).flatMap(token -> {
-            return vaultInternalSystemBackend.disableEngine(vaultClient, token, mount);
-        });
+        return vaultAuthManager
+                .getClientToken(vaultClient)
+                .flatMap(token -> vaultInternalSystemBackend
+                        .disableEngine(vaultClient, token, mount));
     }
 }

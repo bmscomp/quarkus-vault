@@ -4,13 +4,17 @@ import java.util.Objects;
 
 public class KeyConfiguration {
 
-    private String accountName;
-    private String algorithm;
-    private int digits;
-    private String issuer;
-    private int period;
+    private final String accountName;
+    private final String algorithm;
+    private final int digits;
+    private final String issuer;
+    private final int period;
 
-    public KeyConfiguration(String accountName, String algorithm, int digits, String issuer, int period) {
+    public KeyConfiguration(String accountName,
+            String algorithm,
+            int digits,
+            String issuer,
+            int period) {
         this.accountName = accountName;
         this.algorithm = algorithm;
         this.digits = digits;
@@ -59,13 +63,11 @@ public class KeyConfiguration {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("KeyConfiguration{");
-        sb.append("accountName='").append(accountName).append('\'');
-        sb.append(", algorithm='").append(algorithm).append('\'');
-        sb.append(", digits=").append(digits);
-        sb.append(", issuer='").append(issuer).append('\'');
-        sb.append(", period=").append(period);
-        sb.append('}');
-        return sb.toString();
+        return "KeyConfiguration{" + "accountName='" + accountName + '\'' +
+                ", algorithm='" + algorithm + '\'' +
+                ", digits=" + digits +
+                ", issuer='" + issuer + '\'' +
+                ", period=" + period +
+                '}';
     }
 }

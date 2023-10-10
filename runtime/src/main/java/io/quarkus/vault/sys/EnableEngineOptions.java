@@ -22,18 +22,15 @@ public class EnableEngineOptions {
      */
     public Map<String, String> options;
 
-    public EnableEngineOptions setDefaultLeaseTimeToLive(String defaultLeaseTimeToLive) {
+    public void setDefaultLeaseTimeToLive(String defaultLeaseTimeToLive) {
         this.defaultLeaseTimeToLive = defaultLeaseTimeToLive;
-        return this;
     }
 
-    public EnableEngineOptions setMaxLeaseTimeToLive(String maxLeaseTimeToLive) {
+    public void setMaxLeaseTimeToLive(String maxLeaseTimeToLive) {
         this.maxLeaseTimeToLive = maxLeaseTimeToLive;
-        return this;
     }
 
-    public EnableEngineOptions setOptions(Map<String, String> options) {
+    public void setOptions(Map<String, String> options) {
         this.options = options;
-        return this;
     }
 }

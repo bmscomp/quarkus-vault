@@ -11,7 +11,7 @@ import io.quarkus.vault.VaultTransitSecretEngine;
  */
 public class EncryptionRequest extends VaultTransitBatchItem {
 
-    private ClearData data;
+    private final ClearData data;
     private Integer keyVersion;
 
     public EncryptionRequest(ClearData data) {
