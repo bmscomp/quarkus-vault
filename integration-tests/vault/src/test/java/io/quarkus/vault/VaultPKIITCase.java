@@ -27,6 +27,7 @@ import java.util.List;
 
 import jakarta.inject.Inject;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -538,14 +539,7 @@ public class VaultPKIITCase {
         pkiSecretEngine.updateRole("test", roleOptions);
 
         // Test cert generation
-        GenerateCertificateOptions options = new GenerateCertificateOptions();
-        options.setSubjectCommonName("test.example.com");
-        options.setSubjectAlternativeNames(singletonList("alt.example.com"));
-        options.setIpSubjectAlternativeNames(singletonList("1.2.3.4"));
-        options.setUriSubjectAlternativeNames(singletonList("ex:12345"));
-        options.setOtherSubjectAlternativeNames(singletonList("1.3.6.1.4.1.311.20.2.3;UTF8:test"));
-        options.setExcludeCommonNameFromSubjectAlternativeNames(true);
-        options.setTimeToLive("333m");
+        GenerateCertificateOptions options = createGenerateCertificateOption();
 
         GeneratedCertificate result = pkiSecretEngine.generateCertificate("test", options);
 
@@ -617,14 +611,7 @@ public class VaultPKIITCase {
         pkiSecretEngine.updateRole("test", roleOptions);
 
         // Test cert generation
-        GenerateCertificateOptions options = new GenerateCertificateOptions();
-        options.setSubjectCommonName("test.example.com");
-        options.setSubjectAlternativeNames(singletonList("alt.example.com"));
-        options.setIpSubjectAlternativeNames(singletonList("1.2.3.4"));
-        options.setUriSubjectAlternativeNames(singletonList("ex:12345"));
-        options.setOtherSubjectAlternativeNames(singletonList("1.3.6.1.4.1.311.20.2.3;UTF8:test"));
-        options.setExcludeCommonNameFromSubjectAlternativeNames(true);
-        options.setTimeToLive("333m");
+        GenerateCertificateOptions options = createGenerateCertificateOption();
         options.setFormat(DataFormat.DER);
 
         GeneratedCertificate result = pkiSecretEngine.generateCertificate("test", options);
@@ -716,14 +703,7 @@ public class VaultPKIITCase {
                 + "Y0EZ2xRrYf2m+BnAGInOThIHqfFsRE7sdNJemE5jJsB5y/tpH4MQi2DZIJce45bu\n" + "VVlwf9Wg4h289zEGKPbz35MPUMoQfec=\n"
                 + "-----END CERTIFICATE REQUEST-----\n";
 
-        GenerateCertificateOptions options = new GenerateCertificateOptions();
-        options.setSubjectCommonName("test.example.com");
-        options.setSubjectAlternativeNames(singletonList("alt.example.com"));
-        options.setIpSubjectAlternativeNames(singletonList("1.2.3.4"));
-        options.setUriSubjectAlternativeNames(singletonList("ex:12345"));
-        options.setOtherSubjectAlternativeNames(singletonList("1.3.6.1.4.1.311.20.2.3;UTF8:test"));
-        options.setExcludeCommonNameFromSubjectAlternativeNames(true);
-        options.setTimeToLive("333m");
+        GenerateCertificateOptions options = createGenerateCertificateOption();
 
         SignedCertificate result = pkiSecretEngine.signRequest("test", pemCSR, options);
 
@@ -758,6 +738,19 @@ public class VaultPKIITCase {
         // Check returned a serial number
         assertNotNull(result.serialNumber);
         assertFalse(result.serialNumber.isEmpty());
+    }
+
+    @NotNull
+    private static GenerateCertificateOptions createGenerateCertificateOption() {
+        GenerateCertificateOptions options = new GenerateCertificateOptions();
+        options.setSubjectCommonName("test.example.com");
+        options.setSubjectAlternativeNames(singletonList("alt.example.com"));
+        options.setIpSubjectAlternativeNames(singletonList("1.2.3.4"));
+        options.setUriSubjectAlternativeNames(singletonList("ex:12345"));
+        options.setOtherSubjectAlternativeNames(singletonList("1.3.6.1.4.1.311.20.2.3;UTF8:test"));
+        options.setExcludeCommonNameFromSubjectAlternativeNames(true);
+        options.setTimeToLive("333m");
+        return options;
     }
 
     @Test
