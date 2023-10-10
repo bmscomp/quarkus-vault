@@ -61,52 +61,39 @@ public class GenerateCertificateOptions {
      */
     public PrivateKeyEncoding privateKeyEncoding;
 
-    public GenerateCertificateOptions setSubjectCommonName(String subjectCommonName) {
+    public void setSubjectCommonName(String subjectCommonName) {
         this.subjectCommonName = subjectCommonName;
-        return this;
     }
 
-    public GenerateCertificateOptions setSubjectAlternativeNames(List<String> subjectAlternativeNames) {
+    public void setSubjectAlternativeNames(List<String> subjectAlternativeNames) {
         this.subjectAlternativeNames = subjectAlternativeNames;
-        return this;
     }
 
-    public GenerateCertificateOptions setExcludeCommonNameFromSubjectAlternativeNames(
-            Boolean excludeCommonNameFromSubjectAlternativeNames) {
+    public void setExcludeCommonNameFromSubjectAlternativeNames(Boolean excludeCommonNameFromSubjectAlternativeNames) {
         this.excludeCommonNameFromSubjectAlternativeNames = excludeCommonNameFromSubjectAlternativeNames;
-        return this;
     }
 
-    public GenerateCertificateOptions setIpSubjectAlternativeNames(
-            List<String> ipSubjectAlternativeNames) {
+    public void setIpSubjectAlternativeNames(List<String> ipSubjectAlternativeNames) {
         this.ipSubjectAlternativeNames = ipSubjectAlternativeNames;
-        return this;
     }
 
-    public GenerateCertificateOptions setUriSubjectAlternativeNames(
-            List<String> uriSubjectAlternativeNames) {
+    public void setUriSubjectAlternativeNames(List<String> uriSubjectAlternativeNames) {
         this.uriSubjectAlternativeNames = uriSubjectAlternativeNames;
-        return this;
     }
 
-    public GenerateCertificateOptions setOtherSubjectAlternativeNames(
-            List<String> otherSubjectAlternativeNames) {
+    public void setOtherSubjectAlternativeNames(List<String> otherSubjectAlternativeNames) {
         this.otherSubjectAlternativeNames = otherSubjectAlternativeNames;
-        return this;
     }
 
-    public GenerateCertificateOptions setTimeToLive(String timeToLive) {
+    public void setTimeToLive(String timeToLive) {
         this.timeToLive = timeToLive;
-        return this;
     }
 
-    public GenerateCertificateOptions setFormat(DataFormat format) {
+    public void setFormat(DataFormat format) {
         this.format = format;
-        return this;
     }
 
-    public GenerateCertificateOptions setPrivateKeyEncoding(PrivateKeyEncoding privateKeyEncoding) {
+    public void setPrivateKeyEncoding(PrivateKeyEncoding privateKeyEncoding) {
         this.privateKeyEncoding = privateKeyEncoding;
-        return this;
     }
 }
